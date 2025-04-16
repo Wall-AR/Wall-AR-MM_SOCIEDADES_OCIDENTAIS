@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A História Secreta do Ocidente - Prometheus</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Raleway:wght@300;400;600&display=swap');
+        
+        body {
+            font-family: 'Raleway', sans-serif;
+            background-color: #0f0f1a;
+            color: #d6d6e7;
+            background-image: url('https://cdn.jsdelivr.net/gh/tomcardew/mind-map-images@main/stardust.png');
+        }
+        
+        h1, h2, h3, h4 {
+            font-family: 'Cinzel', serif;
+        }
+        
+        .mind-map-container {
+            min-height: 100vh;
+            padding-bottom: 50px;
+        }
+        
+        .node {
+            background-color: rgba(25, 25, 45, 0.85);
+            border: 1px solid #432e63;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(92, 36, 175, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .node:hover {
+            box-shadow: 0 4px 20px rgba(157, 78, 221, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .node-primary {
+            background-color: rgba(41, 22, 77, 0.9);
+            border: 1px solid #5e2ca5;
+        }
+        
+        .connector {
+            position: relative;
+        }
+        
+        .connector::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: -15px;
+            width: 15px;
+            height: 2px;
+            background-color: #5e2ca5;
+        }
+        
+        .connector-vertical::before {
+            height: 100%;
+            width: 2px;
+            top: -50%;
+            left: 50%;
+        }
+        
+        .timeline-bar {
+            position: absolute;
+            left: 40px;
+            top: 150px;
+            width: 4px;
+            height: calc(100% - 300px);
+            background: linear-gradient(to bottom, #5e2ca5, #8e44ad, #3498db);
+            z-index: 1;
+        }
+        
+        .timeline-point {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background-color: #8e44ad;
+            border: 3px solid #5e2ca5;
+            left: -7px;
+            transform: translateY(-50%);
+            z-index: 2;
+        }
+        
+        .concept-badge {
+            background-color: rgba(159, 90, 253, 0.2);
+            border: 1px solid #9f5afd;
+            font-size: 0.85rem;
+        }
+        
+        .person-badge {
+            background-color: rgba(66, 153, 225, 0.2);
+            border: 1px solid #4299e1;
+            font-size: 0.85rem;
+        }
+        
+        .date-badge {
+            background-color: rgba(247, 144, 30, 0.2);
+            border: 1px solid #f7901e;
+            font-size: 0.85rem;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .book-badge {
+            background-color: rgba(72, 187, 120, 0.2);
+            border: 1px solid #48bb78;
+            font-size: 0.85rem;
+        }
+        
+        .society-badge {
+            background-color: rgba(237, 100, 166, 0.2);
+            border: 1px solid #ed64a6;
+            font-size: 0.85rem;
+        }
+        
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+        }
+        
+        .branch-content {
+            margin-left: 30px;
+            border-left: 2px solid #5e2ca5;
+            padding-left: 20px;
+        }
+        
+        .zoom-controls {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            z-index: 100;
+        }
+        
+        .zoom-btn {
+            background-color: rgba(41, 22, 77, 0.9);
+            border: 1px solid #5e2ca5;
+            color: white;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            margin: 5px 0;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(92, 36, 175, 0.3);
+            transition: all 0.2s ease;
+        }
+        
+        .zoom-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(157, 78, 221, 0.5);
+        }
+        
+        .main-content {
+            transform-origin: top left;
+            transition: transform 0.3s ease;
+        }
+        
+        .glow-text {
+            text-shadow: 0 0 10px rgba(157, 78, 221, 0.7);
+        }
+        
+        /* Linha conectora customizada */
+        .custom-connector {
+            position: relative;
+        }
+        
+        .custom-connector::after {
+            content: "";
+            position: absolute;
+            width: 30px;
+            height: 2px;
+            background-color: #5e2ca5;
+            top: 50%;
+            left: -30px;
+        }
+        
+        .connection-line {
+            position: absolute;
+            background-color: #5e2ca5;
+            z-index: 0;
+        }
+
+        .symbol-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+            margin: 8px 0;
+        }
+
+        .person-image {
+            max-width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid #8e44ad;
+            margin: 0 auto 10px;
+            display: block;
+            box-shadow: 0 3px 15px rgba(142, 68, 173, 0.4);
+        }
+
+        .book-image {
+            max-width: 100%;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 6px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+            margin: 8px auto;
+            display: block;
+        }
+
+        .society-image {
+            max-height: 120px;
+            width: auto;
+            max-width: 100%;
+            object-fit: contain;
+            border-radius: 6px;
+            margin: 8px auto;
+            display: block;
+        }
+
+        .concept-image {
+            max-width: 80px;
+            height: auto;
+            margin: 0 auto 10px;
+            display: block;
+        }
+
+        .image-caption {
+            font-size: 0.7rem;
+            text-align: center;
+            margin-top: 4px;
+            opacity: 0.8;
+        }
+
+        /* Estilo especial para imagens responsivas em grades */
+        .grid-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid rgba(142, 68, 173, 0.3);
+        }
+        
+        /* Estilos para as linhas do tempo */
+        .era-label {
+            position: absolute;
+            left: -5px;
+            background-color: #5e2ca5;
+            padding: 5px 10px;
+            border-radius: 15px;
+            transform: translateX(-100%);
+            font-size: 0.8rem;
+            white-space: nowrap;
+            z-index: 20;
+        }
+        
+        /* Conexões visuais entre tradições */
+        .tradition-flow {
+            position: relative;
+            overflow: visible;
+        }
+        
+        .tradition-flow::after {
+            content: "";
+            position: absolute;
+            height: 30px;
+            width: 2px;
+            background: linear-gradient(to bottom, #5e2ca5, #8e44ad);
+            bottom: -30px;
+            left: 50%;
+            z-index: 5;
+        }
+        
+        .tradition-flow::before {
+            content: "↓";
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #8e44ad;
+            font-size: 20px;
+            z-index: 6;
+        }
+        
+        /* Estilo para períodos históricos */
+        .era-header {
+            border-left: 4px solid #8e44ad;
+            padding-left: 15px;
+            margin-bottom: 15px;
+            font-family: 'Cinzel', serif;
+        }
+        
+        /* Footer styles */
+        .footer {
+            background-color: rgba(25, 25, 45, 0.9);
+            border-top: 1px solid #432e63;
+            padding: 20px 0;
+            text-align: center;
+            margin-top: 50px;
+        }
+        
+        .social-icon {
+            font-size: 24px;
+            color: #a87edf;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .social-icon:hover {
+            color: #d4b8f9;
+            transform: scale(1.2);
+        }
+        
+        .connection-container {
+            overflow-x: auto;
+            padding: 20px 0;
+            width: 100%;
+        }
+        
+        .connection-flow {
+            display: flex;
+            min-width: max-content;
+            gap: 15px;
+        }
+        
+        .connection-item {
+            text-align: center;
+            min-width: 120px;
+        }
+        
+        /* Melhorias para visualização em PDF */
+         {
+            .collapsible-content {
+                max-height: none !important;
+                overflow: visible !important;
+            }
+            
+            .node {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+            
+            .zoom-controls {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mind-map-container px-4 py-8 md:px-8 main-content" id="main-content">
+        <!-- Cabeçalho -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-purple-300 mb-4 glow-text">A História Secreta do Ocidente</h1>
+            <h2 class="text-xl md:text-2xl text-blue-300 italic">O Rio Subterrâneo do Conhecimento Esotérico</h2>
+            <div class="mt-6 flex justify-center">
+                <img src="https://cdn.jsdelivr.net/gh/prometheus36/logos@main/prometheus-logo.png" alt="Prometheus Logo" class="h-20">
+            </div>
+        </div>
+
+        <!-- Conceitos Fundamentais -->
+        <div class="node node-primary p-5 mb-12 mx-auto max-w-4xl">
+            <h2 class="text-2xl font-bold mb-4 text-center text-purple-300">
+                <i class="fas fa-key mr-2"></i>O Código Escondido: Ideias Fundamentais
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="p-4 bg-purple-900 bg-opacity-30 rounded-lg">
+                    <img src="https://www.egypttoursportal.com/images/2018/06/Ancient-Egyptian-Symbols-Egypt-Tours-Portal.jpg" alt="Simbolismo de Correspondência" class="concept-image">
+                    <h3 class="font-bold text-lg mb-2 text-purple-300">Correspondências</h3>
+                    <p class="text-sm">"Assim na Terra como no Céu" - O Macrocosmo (universo) e o Microcosmo (ser humano) são espelhos um do outro.</p>
+                    <span class="concept-badge rounded-full px-2 py-1 mt-2 inline-block">Princípio Hermético</span>
+                </div>
+                <div class="p-4 bg-purple-900 bg-opacity-30 rounded-lg">
+                    <img src="https://eternalisedofficial.com/wp-content/uploads/2023/02/Untitled.jpg" alt="Imaginação Ativa" class="concept-image">
+                    <h3 class="font-bold text-lg mb-2 text-purple-300">Imaginação Ativa</h3>
+                    <p class="text-sm">A força mental direcionada como ferramenta para alcançar objetivos. A visualização guiada como "músculo psíquico".</p>
+                    <span class="concept-badge rounded-full px-2 py-1 mt-2 inline-block">Prática Esotérica</span>
+                </div>
+                <div class="p-4 bg-purple-900 bg-opacity-30 rounded-lg">
+                    <img src="https://www.afrikaiswoke.com/wp-content/uploads/2022/08/Alchemy.jpg" alt="Alquimia - Transmutação" class="concept-image">
+                    <h3 class="font-bold text-lg mb-2 text-purple-300">Transmutação</h3>
+                    <p class="text-sm">A transformação do ser "grosseiro" em algo mais nobre. A verdadeira alquimia é interna.</p>
+                    <span class="concept-badge rounded-full px-2 py-1 mt-2 inline-block">Grande Obra</span>
+                </div>
+                <div class="p-4 bg-purple-900 bg-opacity-30 rounded-lg">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/1/1b/Kabbalah_Tree_of_Life.png" alt="Árvore da Vida Cabalística" class="concept-image">
+                    <h3 class="font-bold text-lg mb-2 text-purple-300">Concordância e Transmissão</h3>
+                    <p class="text-sm">Todas as tradições bebem de uma fonte comum (Tradição Primordial). O conhecimento é sempre transmitido, nunca inventado.</p>
+                    <span class="concept-badge rounded-full px-2 py-1 mt-2 inline-block">Perennialismo</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Linha do Tempo Principal -->
+        <div class="relative mt-20">
+            <div class="timeline-bar"></div>
+            
+            <!-- ANTIGUIDADE: Egito e Fontes Antigas -->
+            <div class="relative pl-24 mb-24">
+                <div class="timeline-point" style="top: 30px;"></div>
+                <div class="date-badge rounded-full px-3 py-1 absolute" style="left: 50px; top: 20px;">~1353 a.C. - 300 d.C.</div>
+                <div class="era-label" style="top: 20px;">ANTIGUIDADE</div>
+                <div class="node p-5 custom-connector">
+                    <button class="collapsible w-full text-left">
+                        <h2 class="text-2xl font-bold mb-2 text-yellow-300 flex items-center">
+                            <i class="fas fa-pyramid mr-3"></i>As Fontes Antigas: Egito e Grécia
+                            <i class="fas fa-chevron-down ml-auto text-sm"></i>
+                        </h2>
+                    </button>
+                    <div class="collapsible-content">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div class="p-4 bg-yellow-900 bg-opacity-20 rounded-lg">
+                                <h3 class="font-bold text-lg mb-2 text-yellow-300">O Egito Mítico</h3>
+                                <img src="https://www.cleopatraegypttours.com/wp-content/uploads/2019/10/Egyptian-symbols-1200x1091.jpg" alt="Símbolos Egípcios" class="symbol-image">
+                                <p class="text-sm mb-3">Centro do conhecimento antigo, antes da decifração dos hieróglifos por Champollion. Mistérios de Ísis e Osíris.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Akhenaton (Amenhotep IV)</span>
+                                    <span class="concept-badge rounded-full px-2 py-1 inline-block">Mistérios Egípcios</span>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-yellow-900 bg-opacity-20 rounded-lg">
+                                <h3 class="font-bold text-lg mb-2 text-yellow-300">Hermes Trismegisto</h3>
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c0/Hermes_mercurius_trismegistus_siena_cathedral.jpg" alt="Hermes Trismegisto" class="symbol-image">
+                                <p class="text-sm mb-3">O "Três Vezes Grande", figura mítica associada ao deus egípcio Thoth e ao Mercúrio romano. Suposto autor do Corpus Hermeticum.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="book-badge rounded-full px-2 py-1 inline-block">Corpus Hermeticum</span>
+                                    <span class="concept-badge rounded-full px-2 py-1 inline-block">Hermetismo</span>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-blue-900 bg-opacity-20 rounded-lg">
+                                <h3 class="font-bold text-lg mb-2 text-blue-300">Os Filósofos Iniciados</h3>
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/4/49/%22The_School_of_Athens%22_by_Raffaello_Sanzio_da_Urbino.jpg" alt="Escola de Platão" class="symbol-image">
+                                <p class="text-sm mb-3">Filósofos gregos que viajaram ao Egito e foram influenciados pelos mistérios.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Pitágoras</span>
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Platão</span>
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Tales</span>
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Demócrito</span>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-purple-900 bg-opacity-20 rounded-lg tradition-flow">
+                                <h3 class="font-bold text-lg mb-2 text-purple-300">O Caldeirão Alexandrino</h3>
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/6/64/Ancientlibraryalex.jpg" alt="Biblioteca de Alexandria" class="symbol-image">
+                                <p class="text-sm mb-3">Centro de fusão de saberes após conquistas de Alexandre, o Grande. Biblioteca de Alexandria como repositório de conhecimento.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="concept-badge rounded-full px-2 py-1 inline-block">Alquimia Greco-Egípcia</span>
+                                    <span class="book-badge rounded-full px-2 py-1 inline-block">Tetrabiblos (Ptolomeu)</span>
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Zósimo de Panópolis</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ERA CLÁSSICA/TARDO-ANTIGA: Neoplatonismo e Gnosticismo -->
+            <div class="relative pl-24 mb-24">
+                <div class="timeline-point" style="top: 30px;"></div>
+                <div class="date-badge rounded-full px-3 py-1 absolute" style="left: 50px; top: 20px;">200-500 d.C.</div>
+                <div class="era-label" style="top: 20px;">ERA CLÁSSICA/TARDO-ANTIGA</div>
+                <div class="node p-5 custom-connector">
+                    <button class="collapsible w-full text-left">
+                        <h2 class="text-2xl font-bold mb-2 text-blue-300 flex items-center">
+                            <i class="fas fa-sun mr-3"></i>Correntes Subterrâneas: Neoplatonismo e Gnosticismo
+                            <i class="fas fa-chevron-down ml-auto text-sm"></i>
+                        </h2>
+                    </button>
+                    <div class="collapsible-content">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div class="p-4 bg-blue-900 bg-opacity-20 rounded-lg">
+                                <h3 class="font-bold text-lg mb-2 text-blue-300">Neoplatonismo e Teurgia</h3>
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Plotinos.jpg/330px-Plotinos.jpg" alt="Plotino" class="symbol-image">
+                                <p class="text-sm mb-3">Síntese de platonismo com elementos místicos orientais. Foco em rituais teúrgicos para elevar a alma.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Plotino</span>
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Jâmblico</span>
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Proclo</span>
+                                    <span class="concept-badge rounded-full px-2 py-1 inline-block">Teurgia</span>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-purple-900 bg-opacity-20 rounded-lg">
+                                <h3 class="font-bold text-lg mb-2 text-purple-300">Gnosticismo</h3>
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Codex_Tchacos_p33.jpg/220px-Codex_Tchacos_p33.jpg" alt="Manuscrito Gnóstico" class="symbol-image">
+                                <p class="text-sm mb-3">Sistemas religiosos sincréticos que enfatizavam a Gnosis (conhecimento) como via de salvação. Visão do mundo material como obra de um Demiurgo inferior.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="concept-badge rounded-full px-2 py-1 inline-block">Demiurgo</span>
+                                    <span class="concept-badge rounded-full px-2 py-1 inline-block">Pleroma</span>
+                                    <span class="concept-badge rounded-full px-2 py-1 inline-block">Arcontes</span>
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Valentim</span>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-green-900 bg-opacity-20 rounded-lg tradition-flow colspan-2">
+                                <h3 class="font-bold text-lg mb-2 text-green-300">A Ponte para o Cristianismo</h3>
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Christ_Pantocrator_%28Deesis_mosaic%29%2C_Hagia_Sophia.jpg/280px-Christ_Pantocrator_%28Deesis_mosaic%29%2C_Hagia_Sophia.jpg" alt="Cristo Pantocrator" class="symbol-image">
+                                <p class="text-sm mb-3">Interação entre hermetismo, gnosticismo e cristianismo nascente. Alguns Pais da Igreja viam Hermes como um profeta pré-cristão.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Clemente de Alexandria</span>
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Santo Agostinho</span>
+                                    <span class="concept-badge rounded-full px-2 py-1 inline-block">Sincretismo</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- IDADE MÉDIA: Ponte Árabe e Templários -->
+            <div class="relative pl-24 mb-24">
+                <div class="timeline-point" style="top: 30px;"></div>
+                <div class="date-badge rounded-full px-3 py-1 absolute" style="left: 50px; top: 20px;">700-1300 d.C.</div>
+                <div class="era-label" style="top: 20px;">IDADE MÉDIA</div>
+                <div class="node p-5 custom-connector">
+                    <button class="collapsible w-full text-left">
+                        <h2 class="text-2xl font-bold mb-2 text-green-300 flex items-center">
+                            <i class="fas fa-horse-head mr-3"></i>Da Península Ibérica a Jerusalém: A Ponte Árabe e Os Templários
+                            <i class="fas fa-chevron-down ml-auto text-sm"></i>
+                        </h2>
+                    </button>
+                    <div class="collapsible-content">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div class="p-4 bg-green-900 bg-opacity-20 rounded-lg">
+                                <h3 class="font-bold text-lg mb-2 text-green-300">Contribuição Árabe</h3>
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c5/Al_Khwarizmi.jpg" alt="Astrônomo Árabe" class="symbol-image">
+                                <p class="text-sm mb-3">Preservação e expansão do conhecimento hermético durante a Idade Média. Entrada na Europa via Península Ibérica.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="concept-badge rounded-full px-2 py-1 inline-block">Alquimia Árabe</span>
+                                    <span class="concept-badge rounded-full px-2 py-1 inline-block">Magia de Letras</span>
+                                    <span class="concept-badge rounded-full px-2 py-1 inline-block">Astrologia Talismânica</span>
+                                    <span class="date-badge rounded-full px-2 py-1 inline-block">Séc. VIII - Invasão da P. Ibérica</span>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-red-900 bg-opacity-20 rounded-lg">
+                                <h3 class="font-bold text-lg mb-2 text-red-300">Cavaleiros Templários</h3>
+                                <img src="https://symbolikon.com/wp-content/uploads/edd/2022/09/Knight-Templar-Seal-regular.png" alt="Selo Templário" class="symbol-image">
+                                <p class="text-sm mb-3">Ordem de cavaleiros monges fundada após a Primeira Cruzada. Supostamente guardiões de segredos encontrados em Jerusalém.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Hugo de Payens</span>
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">S. Bernardo de Claraval</span>
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Jacques de Molay</span>
+                                    <span class="date-badge rounded-full px-2 py-1 inline-block">1118 - Fundação</span>
+                                    <span class="date-badge rounded-full px-2 py-1 inline-block">1312 - Dissolução</span>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-yellow-900 bg-opacity-20 rounded-lg tradition-flow colspan-2">
+                                <h3 class="font-bold text-lg mb-2 text-yellow-300">Grimórios e Cabala</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <img src="https://mpd-biblio-covers.imgix.net/9781250897855.jpg" alt="Livro Hermético" class="symbol-image">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/1/1b/Kabbalah_Tree_of_Life.png" alt="Árvore da Vida Cabalística" class="symbol-image">
+                                </div>
+                                <p class="text-sm mb-3">Surgimento de livros de magia organizados e desenvolvimento da Cabala judaica na Espanha medieval.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="book-badge rounded-full px-2 py-1 inline-block">Sefer Raziel (Picatrix)</span>
+                                    <span class="book-badge rounded-full px-2 py-1 inline-block">Zohar</span>
+                                    <span class="book-badge rounded-full px-2 py-1 inline-block">Sefer Bahir</span>
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Abraão Abulafia</span>
+                                    <span class="concept-badge rounded-full px-2 py-1 inline-block">Cabala Contemplativa</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- RENASCIMENTO: Renascença Esotérica -->
+            <div class="relative pl-24 mb-24">
+                <div class="timeline-point" style="top: 30px;"></div>
+                <div class="date-badge rounded-full px-3 py-1 absolute" style="left: 50px; top: 20px;">1453-1600</div>
+                <div class="era-label" style="top: 20px;">RENASCIMENTO</div>
+                <div class="node p-5 custom-connector">
+                    <button class="collapsible w-full text-left">
+                        <h2 class="text-2xl font-bold mb-2 text-orange-300 flex items-center">
+                            <i class="fas fa-landmark mr-3"></i>A Renascença Esotérica: O Segredo Vem à Luz
+                            <i class="fas fa-chevron-down ml-auto text-sm"></i>
+                        </h2>
+                    </button>
+                    <div class="collapsible-content">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                            <div class="p-4 bg-orange-900 bg-opacity-20 rounded-lg">
+                                <h3 class="font-bold text-lg mb-2 text-orange-300">Academia Platônica de Florença</h3>
+                                <img src="https://cdn.britannica.com/46/19246-050-097E6508/Marsilio-Ficino.jpg" alt="Marsilio Ficino" class="symbol-image">
+                                <p class="text-sm mb-3">Centro cultural da Europa, fundado por Cosimo de Medici. A tradução do Corpus Hermeticum revoluciona o pensamento renascentista.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Marsilio Ficino</span>
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Cosimo de Medici</span>
+                                    <span class="book-badge rounded-full px-2 py-1 inline-block">Corpus Hermeticum (Asclepius)</span>
+                                    <span class="date-badge rounded-full px-2 py-1 inline-block">1453 - Fundação</span>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-yellow-900 bg-opacity-20 rounded-lg">
+                                <h3 class="font-bold text-lg mb-2 text-yellow-300">Cabala Cristã</h3>
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Pico_della_mirandola.jpg/250px-Pico_della_mirandola.jpg" alt="Pico della Mirandola" class="symbol-image">
+                                <p class="text-sm mb-3">Síntese da Cabala judaica com o Cristianismo. Introdução do Pentagrammaton como nome místico de Jesus.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Pico della Mirandola</span>
+                                    <span class="concept-badge rounded-full px-2 py-1 inline-block">Tetragrammaton (YHVH)</span>
+                                    <span class="concept-badge rounded-full px-2 py-1 inline-block">Pentagrammaton (YHShVH)</span>
+                                    <span class="concept-badge rounded-full px-2 py-1 inline-block">Magia Angélica</span>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-purple-900 bg-opacity-20 rounded-lg tradition-flow">
+                                <h3 class="font-bold text-lg mb-2 text-purple-300">Compiladores e Inovadores</h3>
+                                <div class="grid grid-cols-2 gap-2 mb-2">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/00/Cornelius_Agrippa.jpg" alt="Heinrich Cornelius Agrippa" class="symbol-image h-28 object-cover">
+                                    <img src="https://cdn.britannica.com/84/121084-050-E7DA0D94/Portrait-Paracelsus-Quinten-Massys-Paris-Louvre-Museum.jpg" alt="Paracelso" class="symbol-image h-28 object-cover">
+                                </div>
+                                <p class="text-sm mb-3">Figuras que sistematizaram, aplicaram e expandiram o conhecimento esotérico renascentista.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Cornelius Agrippa</span>
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Giordano Bruno</span>
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Paracelso</span>
+                                    <span class="book-badge rounded-full px-2 py-1 inline-block">Três Livros de Filosofia Oculta</span>
+                                    <span class="date-badge rounded-full px-2 py-1 inline-block">1600 - Execução de Bruno</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ERA MODERNA (Início): Rosa-Cruz -->
+            <div class="relative pl-24 mb-24">
+                <div class="timeline-point" style="top: 30px;"></div>
+                <div class="date-badge rounded-full px-3 py-1 absolute" style="left: 50px; top: 20px;">1614-1620</div>
+                <div class="era-label" style="top: 20px;">ERA MODERNA (Início)</div>
+                <div class="node p-5 custom-connector">
+                    <button class="collapsible w-full text-left">
+                        <h2 class="text-2xl font-bold mb-2 text-pink-300 flex items-center">
+                            <i class="fas fa-rose mr-3"></i>A Ascensão da Rosa-Cruz: A Fraternidade Invisível
+                            <i class="fas fa-chevron-down ml-auto text-sm"></i>
+                        </h2>
+                    </button>
+                    <div class="collapsible-content">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div class="p-4 bg-pink-900 bg-opacity-20 rounded-lg">
+                                <h3 class="font-bold text-lg mb-2 text-pink-300">Manifestos Rosacruzes</h3>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Fama_Fraternitatis.jpg/220px-Fama_Fraternitatis.jpg" alt="Fama Fraternitatis" class="symbol-image h-28 object-cover">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Chymical_Wedding_of_Christian_Rosenkreutz.jpg" alt="Chymical Wedding" class="symbol-image h-28 object-cover">
+                                </div>
+                                <p class="text-sm mb-3">Publicação anônima de textos que anunciam uma fraternidade secreta dedicada à reforma espiritual e social da Europa.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="book-badge rounded-full px-2 py-1 inline-block">Fama Fraternitatis (1614)</span>
+                                    <span class="book-badge rounded-full px-2 py-1 inline-block">Confessio Fraternitatis (1615)</span>
+                                    <span class="book-badge rounded-full px-2 py-1 inline-block">Núpcias Químicas (1616)</span>
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Christian Rosenkreutz (mítico)</span>
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Johann V. Andreae</span>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-red-900 bg-opacity-20 rounded-lg">
+                                <h3 class="font-bold text-lg mb-2 text-red-300">A Febre Rosacruz</h3>
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Rosy_Cross.svg/640px-Rosy_Cross.svg.png" alt="Rosa-Cruz Símbolo" class="symbol-image">
+                                <p class="text-sm mb-3">Impacto cultural dos manifestos na Europa. Centenas de publicações sobre o tema, fascínio e pânico sociais.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="date-badge rounded-full px-2 py-1 inline-block">1614-1620: 200+ publicações</span>
+                                    <span class="date-badge rounded-full px-2 py-1 inline-block">Até séc. XVIII: ~900 obras</span>
+                                    <span class="concept-badge rounded-full px-2 py-1 inline-block">Ludibrium (jogo/peça)</span>
+                                    <span class="concept-badge rounded-full px-2 py-1 inline-block">Fraternidade Invisível</span>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-purple-900 bg-opacity-20 rounded-lg tradition-flow colspan-2">
+                                <h3 class="font-bold text-lg mb-2 text-purple-300">O Golpe de Casaubon</h3>
+                                <img src="https://m.media-amazon.com/images/I/71u--js5vNL.jpg" alt="Corpus Hermeticum" class="symbol-image max-h-28 mx-auto">
+                                <p class="text-sm mb-3">Refutação da antiguidade do Corpus Hermeticum. Isaac Casaubon prova que os textos herméticos não eram do antigo Egito, mas da era cristã.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Isaac Casaubon</span>
+                                    <span class="date-badge rounded-full px-2 py-1 inline-block">1614 - Publicação da crítica</span>
+                                    <span class="concept-badge rounded-full px-2 py-1 inline-block">Crise de Autoridade Hermética</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ERA MODERNA (Consolidação): Maçonaria -->
+            <div class="relative pl-24 mb-24">
+                <div class="timeline-point" style="top: 30px;"></div>
+                <div class="date-badge rounded-full px-3 py-1 absolute" style="left: 50px; top: 20px;">1717-1800</div>
+                <div class="era-label" style="top: 20px;">ERA MODERNA (Consolidação)</div>
+                <div class="node p-5 custom-connector">
+                    <button class="collapsible w-full text-left">
+                        <h2 class="text-2xl font-bold mb-2 text-blue-300 flex items-center">
+                            <i class="fas fa-square-full mr-3"></i>A Maçonaria: O Templo Visível
+                            <i class="fas fa-chevron-down ml-auto text-sm"></i>
+                        </h2>
+                    </button>
+                    <div class="collapsible-content">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div class="p-4 bg-blue-900 bg-opacity-20 rounded-lg">
+                                <h3 class="font-bold text-lg mb-2 text-blue-300">Dos Pedreiros à Filosofia</h3>
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/a/ac/Square_compasses.svg" alt="Esquadro e Compasso Maçônico" class="symbol-image">
+                                <p class="text-sm mb-3">Transformação de guildas operativas de construtores em sociedades filosóficas que usam ferramentas como símbolos.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="concept-badge rounded-full px-2 py-1 inline-block">Maçonaria Operativa</span>
+                                    <span class="concept-badge rounded-full px-2 py-1 inline-block">Maçonaria Especulativa</span>
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Robert Moray</span>
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Elias Ashmole</span>
+                                    <span class="date-badge rounded-full px-2 py-1 inline-block">1717 - Grande Loja da Inglaterra</span>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-indigo-900 bg-opacity-20 rounded-lg">
+                                <h3 class="font-bold text-lg mb-2 text-indigo-300">Lenda de Hiram e Altos Graus</h3>
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/SophiaMystical.jpg/220px-SophiaMystical.jpg" alt="Simbolismo da Rosa-Cruz Maçônica" class="symbol-image">
+                                <p class="text-sm mb-3">Desenvolvimento do 3º grau maçônico e proliferação de sistemas de altos graus, muitos com elementos rosacruzes.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Hiram Abiff</span>
+                                    <span class="concept-badge rounded-full px-2 py-1 inline-block">Grau de Mestre Maçom</span>
+                                    <span class="society-badge rounded-full px-2 py-1 inline-block">Rito Escocês Antigo e Aceito</span>
+                                    <span class="concept-badge rounded-full px-2 py-1 inline-block">Cavaleiro Rosa-Cruz (18º Grau)</span>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-green-900 bg-opacity-20 rounded-lg tradition-flow colspan-2">
+                                <h3 class="font-bold text-lg mb-2 text-green-300">Variações e Vertentes</h3>
+                                <div class="grid grid-cols-2 gap-2 mb-2">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/f/f9/Louis-Claude_de_Saint-Martin.jpg" alt="Louis-Claude de Saint-Martin" class="symbol-image h-28 object-cover">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/3e/Jacob-B%C3%B6hme.jpg" alt="Jacob Boehme" class="symbol-image h-28 object-cover">
+                                </div>
+                                <p class="text-sm mb-3">Sistemas esotéricos paralelos à Maçonaria regular, desenvolvendo aspectos místicos e teúrgicos.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Martinez de Pasqually</span>
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Louis-Claude de Saint-Martin</span>
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Jean-Baptiste Willermoz</span>
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Alessandro Cagliostro</span>
+                                    <span class="society-badge rounded-full px-2 py-1 inline-block">Elus Coëns</span>
+                                    <span class="society-badge rounded-full px-2 py-1 inline-block">Rito Escocês Retificado</span>
+                                    <span class="society-badge rounded-full px-2 py-1 inline-block">Rito Egípcio</span>
+                                    <span class="concept-badge rounded-full px-2 py-1 inline-block">Reintegração dos Seres</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ERA CONTEMPORÂNEA: Século XIX - Explosão Ocultista -->
+            <div class="relative pl-24 mb-24">
+                <div class="timeline-point" style="top: 30px;"></div>
+                <div class="date-badge rounded-full px-3 py-1 absolute" style="left: 50px; top: 20px;">1850-1930</div>
+                <div class="era-label" style="top: 20px;">ERA CONTEMPORÂNEA</div>
+                <div class="node p-5 custom-connector">
+                    <button class="collapsible w-full text-left">
+                        <h2 class="text-2xl font-bold mb-2 text-purple-300 flex items-center">
+                            <i class="fas fa-magic mr-3"></i>Século XIX: A Explosão Ocultista
+                            <i class="fas fa-chevron-down ml-auto text-sm"></i>
+                        </h2>
+                    </button>
+                    <div class="collapsible-content">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                            <div class="p-4 bg-purple-900 bg-opacity-20 rounded-lg">
+                                <h3 class="font-bold text-lg mb-2 text-purple-300">Eliphas Lévi</h3>
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/9/92/Eliphas_Levi.png" alt="Eliphas Lévi" class="symbol-image">
+                                <p class="text-sm mb-3">O grande renovador do ocultismo europeu. Síntese moderna da Cabala, Tarot e Magia.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Alphonse Louis Constant</span>
+                                    <span class="book-badge rounded-full px-2 py-1 inline-block">Dogma e Ritual da Alta Magia</span>
+                                    <span class="book-badge rounded-full px-2 py-1 inline-block">História da Magia</span>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-yellow-900 bg-opacity-20 rounded-lg">
+                                <h3 class="font-bold text-lg mb-2 text-yellow-300">Golden Dawn</h3>
+                                <div class="grid grid-cols-2 gap-2 mb-2">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Rose_Cross_Lamen.svg/1200px-Rose_Cross_Lamen.svg.png" alt="Rosa Cruz da Golden Dawn" class="symbol-image h-28 object-contain">
+                                    <img src="https://upload.wikimedia.org/wikipedia/en/d/dd/MacGregor_Mathers.jpg" alt="MacGregor Mathers" class="symbol-image h-28 object-cover">
+                                </div>
+                                <p class="text-sm mb-3">A ordem mágica mais influente da era vitoriana. Sistema completo de magia cerimonial e iniciação.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="society-badge rounded-full px-2 py-1 inline-block">SRIA (Rosicruciana Anglica)</span>
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">S.L. MacGregor Mathers</span>
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">W.W. Westcott</span>
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">W.R. Woodman</span>
+                                    <span class="date-badge rounded-full px-2 py-1 inline-block">1888 - Fundação</span>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-blue-900 bg-opacity-20 rounded-lg">
+                                <h3 class="font-bold text-lg mb-2 text-blue-300">Teosofia</h3>
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/7/7a/Helena_Blavatsky.jpg" alt="Helena Blavatsky" class="symbol-image">
+                                <p class="text-sm mb-3">Movimento que buscou sintetizar religiões orientais com o esoterismo ocidental.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Helena P. Blavatsky</span>
+                                    <span class="book-badge rounded-full px-2 py-1 inline-block">Ísis Sem Véu</span>
+                                    <span class="society-badge rounded-full px-2 py-1 inline-block">Sociedade Teosófica</span>
+                                    <span class="date-badge rounded-full px-2 py-1 inline-block">1875 - Fundação</span>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-red-900 bg-opacity-20 rounded-lg">
+                                <h3 class="font-bold text-lg mb-2 text-red-300">Crowley e Thelema</h3>
+                                <div class="grid grid-cols-2 gap-2 mb-2">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Aleister_Crowley%2C_Golden_Dawn.jpg/640px-Aleister_Crowley%2C_Golden_Dawn.jpg" alt="Aleister Crowley" class="symbol-image h-28 object-cover">
+                                    <img src="https://m.media-amazon.com/images/I/61TmUD714cL._AC_UF1000,1000_QL80_.jpg" alt="Liber AL vel Legis" class="symbol-image h-28 object-cover">
+                                </div>
+                                <p class="text-sm mb-3">Figura controversa que buscou criar uma nova síntese mágica e religiosa a partir da Golden Dawn.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Aleister Crowley</span>
+                                    <span class="book-badge rounded-full px-2 py-1 inline-block">Liber AL vel Legis</span>
+                                    <span class="society-badge rounded-full px-2 py-1 inline-block">O.T.O.</span>
+                                    <span class="society-badge rounded-full px-2 py-1 inline-block">A∴A∴</span>
+                                    <span class="date-badge rounded-full px-2 py-1 inline-block">1904 - Livro da Lei</span>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-green-900 bg-opacity-20 rounded-lg">
+                                <h3 class="font-bold text-lg mb-2 text-green-300">Dion Fortune</h3>
+                                <img src="https://upload.wikimedia.org/wikipedia/en/4/4d/Dion_Fortune.jpg" alt="Dion Fortune" class="symbol-image">
+                                <p class="text-sm mb-3">Psicóloga e ocultista que integrou psicologia moderna com práticas mágicas ocidentais.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Violet Firth</span>
+                                    <span class="book-badge rounded-full px-2 py-1 inline-block">A Cabala Mística</span>
+                                    <span class="book-badge rounded-full px-2 py-1 inline-block">A Sacerdotisa do Mar</span>
+                                    <span class="society-badge rounded-full px-2 py-1 inline-block">Sociedade da Luz Interior</span>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-orange-900 bg-opacity-20 rounded-lg">
+                                <h3 class="font-bold text-lg mb-2 text-orange-300">Martinismo e AMORC</h3>
+                                <div class="grid grid-cols-2 gap-2 mb-2">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b3/Bio-papus-image-1.jpg" alt="Papus (Gérard Encausse)" class="symbol-image h-28 object-cover">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/25/Drlewis.gif" alt="H. Spencer Lewis" class="symbol-image h-28 object-cover">
+                                </div>
+                                <p class="text-sm mb-3">Revitalização das tradições rosacruzes e martinistas na França e América.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Papus (Gérard Encausse)</span>
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">Joséphin Péladan</span>
+                                    <span class="person-badge rounded-full px-2 py-1 inline-block">H. Spencer Lewis</span>
+                                    <span class="society-badge rounded-full px-2 py-1 inline-block">Ordem Martinista</span>
+                                    <span class="society-badge rounded-full px-2 py-1 inline-block">AMORC</span>
+                                    <span class="date-badge rounded-full px-2 py-1 inline-block">1889 - Ordem Martinista</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Conclusão -->
+        <div class="node node-primary p-5 mb-12 mx-auto max-w-4xl">
+            <h2 class="text-2xl font-bold mb-4 text-center text-purple-300">
+                <i class="fas fa-water mr-2"></i>O Rio Continua a Fluir
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <img src="https://www.researchgate.net/publication/286018391/figure/fig1/AS:1058037250928640@1629267146451/The-structure-of-the-Tree-of-Life-of-Kabbalah-model-with-10-sefirot-plus-sefira-Knowledge.png" alt="Árvore da Vida Cabalística" class="grid-image">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/1/1a/Corpus_Hermeticum.jpg" alt="Corpus Hermeticum" class="grid-image">
+            </div>
+            <p class="mb-4">De sacerdotes egípcios a filósofos gregos, de alquimistas medievais a magos renascentistas, de Rosacruzes invisíveis a maçons construtores de catedrais e de caráter, de místicos franceses a ocultistas modernos... o que vimos hoje não são apenas histórias isoladas. É um vislumbre de uma Tradição contínua, um rio subterrâneo que atravessa toda a história ocidental.</p>
+            <p>Nada se cria do zero. Somos todos herdeiros, continuadores. As formas mudam, os nomes se alteram, mas a busca por conhecimento, por autotransformação, pela conexão com algo maior, persiste. Oriente e Ocidente, como a Lótus e a Rosa, sempre se tocaram, sempre se nutriram mutuamente.</p>
+        </div>
+        
+        <!-- Conexões Conceituais (Horizontal Diagram) -->
+        <div class="node p-5 mb-12 mx-auto max-w-5xl">
+            <h2 class="text-2xl font-bold mb-6 text-center text-blue-300">
+                <i class="fas fa-project-diagram mr-2"></i>Conexões Conceituais Através do Tempo
+            </h2>
+            <div class="connection-container">
+                <div class="connection-flow">
+                    <div class="connection-item">
+                        <div class="p-3 bg-yellow-900 bg-opacity-20 rounded-lg text-center">
+                            <img src="https://www.egypttoursportal.com/images/2018/06/The-Scarab-Ancient-Egyptian-Symbols-Egypt-Tours-Portal-1.jpg" alt="Escaravelho Egípcio" class="concept-image">
+                            <h3 class="font-bold text-sm mb-2 text-yellow-300">Egito</h3>
+                            <p class="text-xs">Mistérios de Ísis e Osíris</p>
+                        </div>
+                        <div class="h-4 w-0.5 bg-yellow-700 mx-auto my-1"></div>
+                        <div class="h-0.5 w-full bg-yellow-700"></div>
+                    </div>
+                    
+                    <div class="connection-item">
+                        <div class="p-3 bg-blue-900 bg-opacity-20 rounded-lg text-center">
+                            <img src="https://eternalisedofficial.com/wp-content/uploads/2023/02/Untitled.jpg" alt="Hermes Trimegisto" class="concept-image">
+                            <h3 class="font-bold text-sm mb-2 text-blue-300">Alexandria</h3>
+                            <p class="text-xs">Hermetismo & Alquimia</p>
+                        </div>
+                        <div class="h-4 w-0.5 bg-blue-700 mx-auto my-1"></div>
+                        <div class="h-0.5 w-full bg-blue-700"></div>
+                    </div>
+                    
+                    <div class="connection-item">
+                        <div class="p-3 bg-purple-900 bg-opacity-20 rounded-lg text-center">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Plotinos.jpg/330px-Plotinos.jpg" alt="Plotino" class="concept-image">
+                            <h3 class="font-bold text-sm mb-2 text-purple-300">Neoplatonismo</h3>
+                            <p class="text-xs">Teurgia & Magia</p>
+                        </div>
+                        <div class="h-4 w-0.5 bg-purple-700 mx-auto my-1"></div>
+                        <div class="h-0.5 w-full bg-purple-700"></div>
+                    </div>
+                    
+                    <div class="connection-item">
+                        <div class="p-3 bg-red-900 bg-opacity-20 rounded-lg text-center">
+                            <img src="https://symbolikon.com/wp-content/uploads/edd/2022/09/Knight-Templar-Seal-regular.png" alt="Selo Templário" class="concept-image">
+                            <h3 class="font-bold text-sm mb-2 text-red-300">Templários</h3>
+                            <p class="text-xs">Esoterismo Cristão</p>
+                        </div>
+                        <div class="h-4 w-0.5 bg-red-700 mx-auto my-1"></div>
+                        <div class="h-0.5 w-full bg-red-700"></div>
+                    </div>
+                    
+                    <div class="connection-item">
+                        <div class="p-3 bg-orange-900 bg-opacity-20 rounded-lg text-center">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Corpus_Hermeticum.jpg/330px-Corpus_Hermeticum.jpg" alt="Corpus Hermeticum" class="concept-image">
+                            <h3 class="font-bold text-sm mb-2 text-orange-300">Renascimento</h3>
+                            <p class="text-xs">Cabala & Magia Natural</p>
+                        </div>
+                        <div class="h-4 w-0.5 bg-orange-700 mx-auto my-1"></div>
+                        <div class="h-0.5 w-full bg-orange-700"></div>
+                    </div>
+                    
+                    <div class="connection-item">
+                        <div class="p-3 bg-pink-900 bg-opacity-20 rounded-lg text-center">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Rosy_Cross.svg/640px-Rosy_Cross.svg.png" alt="Rosa-Cruz" class="concept-image">
+                            <h3 class="font-bold text-sm mb-2 text-pink-300">Rosa-Cruz</h3>
+                            <p class="text-xs">Reforma Espiritual</p>
+                        </div>
+                        <div class="h-4 w-0.5 bg-pink-700 mx-auto my-1"></div>
+                        <div class="h-0.5 w-full bg-pink-700"></div>
+                    </div>
+                    
+                    <div class="connection-item">
+                        <div class="p-3 bg-blue-900 bg-opacity-20 rounded-lg text-center">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/a/ac/Square_compasses.svg" alt="Esquadro e Compasso" class="concept-image">
+                            <h3 class="font-bold text-sm mb-2 text-blue-300">Maçonaria</h3>
+                            <p class="text-xs">Construção Simbólica</p>
+                        </div>
+                        <div class="h-4 w-0.5 bg-blue-700 mx-auto my-1"></div>
+                        <div class="h-0.5 w-full bg-blue-700"></div>
+                    </div>
+                    
+                    <div class="connection-item">
+                        <div class="p-3 bg-green-900 bg-opacity-20 rounded-lg text-center">
+                            <img src="https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1337100804i/1471147.jpg" alt="Martinismo" class="concept-image">
+                            <h3 class="font-bold text-sm mb-2 text-green-300">Martinismo</h3>
+                            <p class="text-xs">Via Interior</p>
+                        </div>
+                        <div class="h-4 w-0.5 bg-green-700 mx-auto my-1"></div>
+                        <div class="h-0.5 w-full bg-green-700"></div>
+                    </div>
+                    
+                    <div class="connection-item">
+                        <div class="p-3 bg-purple-900 bg-opacity-20 rounded-lg text-center">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Rose_Cross_Lamen.svg/1200px-Rose_Cross_Lamen.svg.png" alt="Golden Dawn" class="concept-image">
+                            <h3 class="font-bold text-sm mb-2 text-purple-300">Ocultismo Moderno</h3>
+                            <p class="text-xs">Síntese Esotérica</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="p-3 bg-purple-900 bg-opacity-20 rounded-lg text-center">
+                        <img src="https://www.egypttoursportal.com/images/2018/06/Ancient-Egyptian-Symbols-Egypt-Tours-Portal.jpg" alt="Correspondências" class="concept-image">
+                        <h3 class="font-bold text-sm mb-2 text-purple-300">Correspondências</h3>
+                        <p class="text-xs">Relações entre macrocosmo e microcosmo</p>
+                    </div>
+                    <div class="p-3 bg-blue-900 bg-opacity-20 rounded-lg text-center">
+                        <img src="https://eternalisedofficial.com/wp-content/uploads/2023/02/Untitled.jpg" alt="Imaginação Ativa" class="concept-image">
+                        <h3 class="font-bold text-sm mb-2 text-blue-300">Imaginação Ativa</h3>
+                        <p class="text-xs">Visualização como ferramenta espiritual</p>
+                    </div>
+                    <div class="p-3 bg-green-900 bg-opacity-20 rounded-lg text-center">
+                        <img src="https://www.afrikaiswoke.com/wp-content/uploads/2022/08/Alchemy.jpg" alt="Transmutação" class="concept-image">
+                        <h3 class="font-bold text-sm mb-2 text-green-300">Transmutação</h3>
+                        <p class="text-xs">Transformação de si e do mundo</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Livros Fundamentais -->
+        <div class="node p-5 mb-12 mx-auto max-w-4xl">
+            <h2 class="text-2xl font-bold mb-6 text-center text-green-300">
+                <i class="fas fa-book mr-2"></i>Textos e Livros Fundamentais
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <div class="p-3 bg-green-900 bg-opacity-20 rounded-lg">
+                    <h3 class="font-bold text-md mb-2 text-green-300">Corpus Hermeticum</h3>
+                    <img src="https://m.media-amazon.com/images/I/71u--js5vNL.jpg" alt="Corpus Hermeticum" class="book-image">
+                    <p class="text-xs">Tratados atribuídos a Hermes Trismegisto, traduzidos por Ficino em 1463.</p>
+                    <span class="date-badge rounded-full px-2 py-1 text-xs mt-2 inline-block">c. 2-3 século d.C.</span>
+                </div>
+                <div class="p-3 bg-green-900 bg-opacity-20 rounded-lg">
+                    <h3 class="font-bold text-md mb-2 text-green-300">Zohar</h3>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b0/Zohar_first_edition.jpg" alt="Zohar" class="book-image">
+                    <p class="text-xs">Texto fundamental da Cabala judaica, apareceu na Espanha medieval.</p>
+                    <span class="date-badge rounded-full px-2 py-1 text-xs mt-2 inline-block">c. 1280</span>
+                </div>
+                <div class="p-3 bg-green-900 bg-opacity-20 rounded-lg">
+                    <h3 class="font-bold text-md mb-2 text-green-300">Fama Fraternitatis</h3>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/76/Fama-fraternitatis.jpg" alt="Fama Fraternitatis" class="book-image">
+                    <p class="text-xs">Primeiro manifesto rosacruz, anunciando a Fraternidade.</p>
+                    <span class="date-badge rounded-full px-2 py-1 text-xs mt-2 inline-block">1614</span>
+                </div>
+                <div class="p-3 bg-green-900 bg-opacity-20 rounded-lg">
+                    <h3 class="font-bold text-md mb-2 text-green-300">Núpcias Químicas</h3>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Chymical_Wedding_of_Christian_Rosenkreutz.jpg" alt="Chymical Wedding" class="book-image">
+                    <p class="text-xs">Terceiro manifesto rosacruz, alegoria alquímica do caminho iniciático.</p>
+                    <span class="date-badge rounded-full px-2 py-1 text-xs mt-2 inline-block">1616</span>
+                </div>
+                <div class="p-3 bg-green-900 bg-opacity-20 rounded-lg">
+                    <h3 class="font-bold text-md mb-2 text-green-300">Três Livros de Filosofia Oculta</h3>
+                    <img src="https://m.media-amazon.com/images/I/91tnPS7DKIL._AC_UF1000,1000_QL80_.jpg" alt="Três Livros de Filosofia Oculta" class="book-image">
+                    <p class="text-xs">Compilação enciclopédica de Agrippa sobre magia, cabala e hermetismo.</p>
+                    <span class="date-badge rounded-full px-2 py-1 text-xs mt-2 inline-block">1531-1533</span>
+                </div>
+                <div class="p-3 bg-green-900 bg-opacity-20 rounded-lg">
+                    <h3 class="font-bold text-md mb-2 text-green-300">Dogma e Ritual da Alta Magia</h3>
+                    <img src="https://m.media-amazon.com/images/I/61onvwMM6VL._AC_UF1000,1000_QL80_.jpg" alt="Dogma e Ritual da Alta Magia" class="book-image">
+                    <p class="text-xs">Obra-prima de Eliphas Lévi que revitalizou o ocultismo europeu.</p>
+                    <span class="date-badge rounded-full px-2 py-1 text-xs mt-2 inline-block">1854-1856</span>
+                </div>
+                <div class="p-3 bg-green-900 bg-opacity-20 rounded-lg">
+                    <h3 class="font-bold text-md mb-2 text-green-300">Liber AL vel Legis</h3>
+                    <img src="https://m.media-amazon.com/images/I/61TmUD714cL._AC_UF1000,1000_QL80_.jpg" alt="Liber AL vel Legis" class="book-image">
+                    <p class="text-xs">O Livro da Lei de Crowley, fundamento da religião Thelema.</p>
+                    <span class="date-badge rounded-full px-2 py-1 text-xs mt-2 inline-block">1904</span>
+                </div>
+            </div>
+        </div>
+            
+        <!-- Figuras-Chave -->
+        <div class="node p-5 mb-12 mx-auto max-w-4xl">
+            <h2 class="text-2xl font-bold mb-6 text-center text-blue-300">
+                <i class="fas fa-user-circle mr-2"></i>Figuras-Chave Através dos Séculos
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div class="p-3 bg-blue-900 bg-opacity-20 rounded-lg text-center">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c0/Hermes_mercurius_trismegistus_siena_cathedral.jpg" alt="Hermes Trismegisto" class="person-image">
+                    <h3 class="font-bold text-md mb-1 text-blue-300">Hermes Trismegisto</h3>
+                    <p class="text-xs">Figura mítica, associada a Thoth/Mercúrio.</p>
+                    <span class="date-badge rounded-full px-2 py-1 text-xs mt-1 inline-block">Lendário</span>
+                </div>
+                <div class="p-3 bg-blue-900 bg-opacity-20 rounded-lg text-center">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Plotinos.jpg/330px-Plotinos.jpg" alt="Plotino" class="person-image">
+                    <h3 class="font-bold text-md mb-1 text-blue-300">Plotino</h3>
+                    <p class="text-xs">Fundador do Neoplatonismo.</p>
+                    <span class="date-badge rounded-full px-2 py-1 text-xs mt-1 inline-block">205-270 d.C.</span>
+                </div>
+                <div class="p-3 bg-blue-900 bg-opacity-20 rounded-lg text-center">
+                    <img src="https://cdn.britannica.com/46/19246-050-097E6508/Marsilio-Ficino.jpg" alt="Marsilio Ficino" class="person-image">
+                    <h3 class="font-bold text-md mb-1 text-blue-300">Marsilio Ficino</h3>
+                    <p class="text-xs">Tradutor do Corpus Hermeticum.</p>
+                    <span class="date-badge rounded-full px-2 py-1 text-xs mt-1 inline-block">1433-1499</span>
+                </div>
+                <div class="p-3 bg-blue-900 bg-opacity-20 rounded-lg text-center">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Pico_della_mirandola.jpg/250px-Pico_della_mirandola.jpg" alt="Pico della Mirandola" class="person-image">
+                    <h3 class="font-bold text-md mb-1 text-blue-300">Pico della Mirandola</h3>
+                    <p class="text-xs">Fundador da Cabala Cristã.</p>
+                    <span class="date-badge rounded-full px-2 py-1 text-xs mt-1 inline-block">1463-1494</span>
+                </div>
+                <div class="p-3 bg-blue-900 bg-opacity-20 rounded-lg text-center">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/00/Cornelius_Agrippa.jpg" alt="Heinrich Cornelius Agrippa" class="person-image">
+                    <h3 class="font-bold text-md mb-1 text-blue-300">H. Cornelius Agrippa</h3>
+                    <p class="text-xs">Compilador enciclopédico do ocultismo.</p>
+                    <span class="date-badge rounded-full px-2 py-1 text-xs mt-1 inline-block">1486-1535</span>
+                </div>
+                <div class="p-3 bg-blue-900 bg-opacity-20 rounded-lg text-center">
+                    <img src="https://i.etsystatic.com/23816357/r/il/ff6941/2983483606/il_fullxfull.2983483606_64vn.jpg" alt="Christian Rosenkreutz" class="person-image">
+                    <h3 class="font-bold text-md mb-1 text-blue-300">Christian Rosenkreutz</h3>
+                    <p class="text-xs">Fundador mítico da ordem Rosacruz.</p>
+                    <span class="date-badge rounded-full px-2 py-1 text-xs mt-1 inline-block">c. 1378-1484 (mítico)</span>
+                </div>
+                <div class="p-3 bg-blue-900 bg-opacity-20 rounded-lg text-center">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/f/f9/Louis-Claude_de_Saint-Martin.jpg" alt="Louis-Claude de Saint-Martin" class="person-image">
+                    <h3 class="font-bold text-md mb-1 text-blue-300">Louis-Claude de Saint-Martin</h3>
+                    <p class="text-xs">O "Filósofo Desconhecido", místico e martinista.</p>
+                    <span class="date-badge rounded-full px-2 py-1 text-xs mt-1 inline-block">1743-1803</span>
+                </div>
+                <div class="p-3 bg-blue-900 bg-opacity-20 rounded-lg text-center">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/3e/Jacob-B%C3%B6hme.jpg" alt="Jacob Boehme" class="person-image">
+                    <h3 class="font-bold text-md mb-1 text-blue-300">Jacob Boehme</h3>
+                    <p class="text-xs">Místico alemão, inspiração para Saint-Martin.</p>
+                    <span class="date-badge rounded-full px-2 py-1 text-xs mt-1 inline-block">1575-1624</span>
+                </div>
+                <div class="p-3 bg-blue-900 bg-opacity-20 rounded-lg text-center">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/9/92/Eliphas_Levi.png" alt="Eliphas Lévi" class="person-image">
+                    <h3 class="font-bold text-md mb-1 text-blue-300">Eliphas Lévi</h3>
+                    <p class="text-xs">Renovador do ocultismo no século XIX.</p>
+                    <span class="date-badge rounded-full px-2 py-1 text-xs mt-1 inline-block">1810-1875</span>
+                </div>
+                <div class="p-3 bg-blue-900 bg-opacity-20 rounded-lg text-center">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/7a/Helena_Blavatsky.jpg" alt="Helena Blavatsky" class="person-image">
+                    <h3 class="font-bold text-md mb-1 text-blue-300">H. P. Blavatsky</h3>
+                    <p class="text-xs">Fundadora da Sociedade Teosófica.</p>
+                    <span class="date-badge rounded-full px-2 py-1 text-xs mt-1 inline-block">1831-1891</span>
+                </div>
+                <div class="p-3 bg-blue-900 bg-opacity-20 rounded-lg text-center">
+                    <img src="https://upload.wikimedia.org/wikipedia/en/d/dd/MacGregor_Mathers.jpg" alt="MacGregor Mathers" class="person-image">
+                    <h3 class="font-bold text-md mb-1 text-blue-300">S. L. MacGregor Mathers</h3>
+                    <p class="text-xs">Co-fundador da Golden Dawn.</p>
+                    <span class="date-badge rounded-full px-2 py-1 text-xs mt-1 inline-block">1854-1918</span>
+                </div>
+                <div class="p-3 bg-blue-900 bg-opacity-20 rounded-lg text-center">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Aleister_Crowley%2C_Golden_Dawn.jpg/640px-Aleister_Crowley%2C_Golden_Dawn.jpg" alt="Aleister Crowley" class="person-image">
+                    <h3 class="font-bold text-md mb-1 text-blue-300">Aleister Crowley</h3>
+                    <p class="text-xs">Mago e fundador de Thelema.</p>
+                    <span class="date-badge rounded-full px-2 py-1 text-xs mt-1 inline-block">1875-1947</span>
+                </div>
+                <div class="p-3 bg-blue-900 bg-opacity-20 rounded-lg text-center">
+                    <img src="https://upload.wikimedia.org/wikipedia/en/4/4d/Dion_Fortune.jpg" alt="Dion Fortune" class="person-image">
+                    <h3 class="font-bold text-md mb-1 text-blue-300">Dion Fortune</h3>
+                    <p class="text-xs">Psicóloga, ocultista e escritora.</p>
+                    <span class="date-badge rounded-full px-2 py-1 text-xs mt-1 inline-block">1890-1946</span>
+                </div>
+                <div class="p-3 bg-blue-900 bg-opacity-20 rounded-lg text-center">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b3/Bio-papus-image-1.jpg" alt="Papus (Gérard Encausse)" class="person-image">
+                    <h3 class="font-bold text-md mb-1 text-blue-300">Papus (Gérard Encausse)</h3>
+                    <p class="text-xs">Fundador da Ordem Martinista.</p>
+                    <span class="date-badge rounded-full px-2 py-1 text-xs mt-1 inline-block">1865-1916</span>
+                </div>
+                <div class="p-3 bg-blue-900 bg-opacity-20 rounded-lg text-center">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a0/Marcellin_Desboutin_-_Portrait_du_S%C3%A2r_M%C3%A9rodack_Jos%C3%A9phin_P%C3%A9ladan.jpg" alt="Joséphin Péladan" class="person-image">
+                    <h3 class="font-bold text-md mb-1 text-blue-300">Joséphin Péladan</h3>
+                    <p class="text-xs">Fundador da Ordem Católica Rosacruz.</p>
+                    <span class="date-badge rounded-full px-2 py-1 text-xs mt-1 inline-block">1858-1918</span>
+                </div>
+                <div class="p-3 bg-blue-900 bg-opacity-20 rounded-lg text-center">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/25/Drlewis.gif" alt="H. Spencer Lewis" class="person-image">
+                    <h3 class="font-bold text-md mb-1 text-blue-300">H. Spencer Lewis</h3>
+                    <p class="text-xs">Fundador da AMORC.</p>
+                    <span class="date-badge rounded-full px-2 py-1 text-xs mt-1 inline-block">1883-1939</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sociedades Secretas -->
+        <div class="node p-5 mb-12 mx-auto max-w-4xl">
+            <h2 class="text-2xl font-bold mb-6 text-center text-pink-300">
+                <i class="fas fa-users-cog mr-2"></i>Principais Sociedades Secretas
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="p-4 bg-pink-900 bg-opacity-20 rounded-lg">
+                    <img src="https://symbolikon.com/wp-content/uploads/edd/2022/09/Knight-Templar-Seal-regular.png" alt="Selo Templário" class="society-image">
+                    <h3 class="font-bold text-md mb-2 text-pink-300">Cavaleiros Templários</h3>
+                    <p class="text-xs mb-1">Ordem monástica militar fundada após a Primeira Cruzada.</p>
+                    <div class="flex flex-wrap gap-2 mb-1">
+                        <span class="date-badge rounded-full px-2 py-1 text-xs inline-block">1118-1312</span>
+                    </div>
+                    <p class="text-xs mb-1">Fundadores: Hugo de Payens, Godofredo de Saint-Omer</p>
+                    <p class="text-xs">Missão pública: Proteger peregrinos na Terra Santa</p>
+                </div>
+                <div class="p-4 bg-pink-900 bg-opacity-20 rounded-lg">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Rosy_Cross.svg/640px-Rosy_Cross.svg.png" alt="Rosa-Cruz" class="society-image">
+                    <h3 class="font-bold text-md mb-2 text-pink-300">Ordem Rosacruz</h3>
+                    <p class="text-xs mb-1">Fraternidade mítica anunciada por manifestos anônimos.</p>
+                    <div class="flex flex-wrap gap-2 mb-1">
+                        <span class="date-badge rounded-full px-2 py-1 text-xs inline-block">1614-1616 (manifestos)</span>
+                    </div>
+                    <p class="text-xs mb-1">Fundador: Christian Rosenkreutz (figura mítica)</p>
+                    <p class="text-xs">Missão: Reforma espiritual, religiosa e científica da Europa</p>
+                </div>
+                <div class="p-4 bg-pink-900 bg-opacity-20 rounded-lg">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/ac/Square_compasses.svg" alt="Esquadro e Compasso Maçônico" class="society-image">
+                    <h3 class="font-bold text-md mb-2 text-pink-300">Maçonaria</h3>
+                    <p class="text-xs mb-1">Sociedade fraternal evoluída de guildas de pedreiros medievais.</p>
+                    <div class="flex flex-wrap gap-2 mb-1">
+                        <span class="date-badge rounded-full px-2 py-1 text-xs inline-block">1717 - Grande Loja da Inglaterra</span>
+                    </div>
+                    <p class="text-xs mb-1">Estrutura: Lojas de Aprendizes, Companheiros e Mestres</p>
+                    <p class="text-xs">Missão: Aperfeiçoamento moral e espiritual através de símbolos</p>
+                </div>
+                <div class="p-4 bg-pink-900 bg-opacity-20 rounded-lg">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Rose_Cross_Lamen.svg/1200px-Rose_Cross_Lamen.svg.png" alt="Golden Dawn" class="society-image">
+                    <h3 class="font-bold text-md mb-2 text-pink-300">Hermetic Order of the Golden Dawn</h3>
+                    <p class="text-xs mb-1">Ordem mágica britânica com sistema iniciático completo.</p>
+                    <div class="flex flex-wrap gap-2 mb-1">
+                        <span class="date-badge rounded-full px-2 py-1 text-xs inline-block">1888-c.1903</span>
+                    </div>
+                    <p class="text-xs mb-1">Fundadores: Mathers, Westcott, Woodman</p>
+                    <p class="text-xs">Sistema: Cabala, Tarot, astrologia, magia cerimonial, alquimia</p>
+                </div>
+                <div class="p-4 bg-pink-900 bg-opacity-20 rounded-lg">
+                    <img src="https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1337100804i/1471147.jpg" alt="Martinismo" class="society-image">
+                    <h3 class="font-bold text-md mb-2 text-pink-300">Elus Coëns</h3>
+                    <p class="text-xs mb-1">Ordem teúrgica focada na reintegração espiritual.</p>
+                    <div class="flex flex-wrap gap-2 mb-1">
+                        <span class="date-badge rounded-full px-2 py-1 text-xs inline-block">c.1760-1780</span>
+                    </div>
+                    <p class="text-xs mb-1">Fundador: Martinez de Pasqually</p>
+                    <p class="text-xs">Prática: Rituais teúrgicos complexos buscando contato com entidades</p>
+                </div>
+                <div class="p-4 bg-pink-900 bg-opacity-20 rounded-lg">
+                    <img src="https://678d7c627720ddde2df2-c5b158543cb4b709e42fdf5583590d2f.ssl.cf5.rackcdn.com/harvey_spencer_lewis.jpg" alt="AMORC" class="society-image">
+                    <h3 class="font-bold text-md mb-2 text-pink-300">AMORC</h3>
+                    <p class="text-xs mb-1">Antiga e Mística Ordem Rosae Crucis - maior organização rosacruz.</p>
+                    <div class="flex flex-wrap gap-2 mb-1">
+                        <span class="date-badge rounded-full px-2 py-1 text-xs inline-block">Fundada em 1915</span>
+                    </div>
+                    <p class="text-xs mb-1">Fundador: H. Spencer Lewis</p>
+                    <p class="text-xs">Inovação: Ensino por correspondência e monografias</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Datas Cruciais -->
+        <div class="node p-5 mb-12 mx-auto max-w-4xl">
+            <h2 class="text-2xl font-bold mb-6 text-center text-orange-300">
+                <i class="fas fa-calendar-alt mr-2"></i>Datas-Chave da História Esotérica
+            </h2>
+            <div class="relative overflow-hidden">
+                <div class="h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 absolute w-full top-5"></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-10">
+                    <div class="p-3 bg-orange-900 bg-opacity-20 rounded-lg relative">
+                        <div class="h-5 w-1 bg-orange-500 absolute -top-5 left-1/2 transform -translate-x-1/2"></div>
+                        <h3 class="font-bold text-md mb-1 text-orange-300">c. 300 a.C. - 300 d.C.</h3>
+                        <p class="text-xs">Surgimento dos textos herméticos em Alexandria, mistura de influências egípcias e gregas</p>
+                    </div>
+                    <div class="p-3 bg-orange-900 bg-opacity-20 rounded-lg relative">
+                        <div class="h-5 w-1 bg-orange-500 absolute -top-5 left-1/2 transform -translate-x-1/2"></div>
+                        <h3 class="font-bold text-md mb-1 text-orange-300">1118</h3>
+                        <p class="text-xs">Fundação da Ordem dos Cavaleiros Templários em Jerusalém por Hugo de Payens</p>
+                    </div>
+                    <div class="p-3 bg-orange-900 bg-opacity-20 rounded-lg relative">
+                        <div class="h-5 w-1 bg-orange-500 absolute -top-5 left-1/2 transform -translate-x-1/2"></div>
+                        <h3 class="font-bold text-md mb-1 text-orange-300">1312</h3>
+                        <p class="text-xs">Dissolução da Ordem Templária pelo Papa Clemente V sob pressão do Rei Filipe IV da França</p>
+                    </div>
+                    <div class="p-3 bg-orange-900 bg-opacity-20 rounded-lg relative">
+                        <div class="h-5 w-1 bg-orange-500 absolute -top-5 left-1/2 transform -translate-x-1/2"></div>
+                        <h3 class="font-bold text-md mb-1 text-orange-300">1453</h3>
+                        <p class="text-xs">Fundação da Academia Platônica de Florença por Cosimo de Medici, centro do Neoplatonismo renascentista</p>
+                    </div>
+                    <div class="p-3 bg-orange-900 bg-opacity-20 rounded-lg relative">
+                        <div class="h-5 w-1 bg-orange-500 absolute -top-5 left-1/2 transform -translate-x-1/2"></div>
+                        <h3 class="font-bold text-md mb-1 text-orange-300">1614</h3>
+                        <p class="text-xs">Publicação do Fama Fraternitatis, primeiro manifesto rosacruz, e demonstração por Isaac Casaubon de que o Corpus Hermeticum era mais recente que o suposto</p>
+                    </div>
+                    <div class="p-3 bg-orange-900 bg-opacity-20 rounded-lg relative">
+                        <div class="h-5 w-1 bg-orange-500 absolute -top-5 left-1/2 transform -translate-x-1/2"></div>
+                        <h3 class="font-bold text-md mb-1 text-orange-300">1717</h3>
+                        <p class="text-xs">Fundação da Grande Loja da Inglaterra, marco da Maçonaria moderna especulativa</p>
+                    </div>
+                    <div class="p-3 bg-orange-900 bg-opacity-20 rounded-lg relative">
+                        <div class="h-5 w-1 bg-orange-500 absolute -top-5 left-1/2 transform -translate-x-1/2"></div>
+                        <h3 class="font-bold text-md mb-1 text-orange-300">1854</h3>
+                        <p class="text-xs">Publicação de Dogma e Ritual da Alta Magia por Eliphas Lévi, marco do renascimento ocultista</p>
+                    </div>
+                    <div class="p-3 bg-orange-900 bg-opacity-20 rounded-lg relative">
+                        <div class="h-5 w-1 bg-orange-500 absolute -top-5 left-1/2 transform -translate-x-1/2"></div>
+                        <h3 class="font-bold text-md mb-1 text-orange-300">1875</h3>
+                        <p class="text-xs">Fundação da Sociedade Teosófica por Helena Petrovna Blavatsky em Nova York</p>
+                    </div>
+                    <div class="p-3 bg-orange-900 bg-opacity-20 rounded-lg relative">
+                        <div class="h-5 w-1 bg-orange-500 absolute -top-5 left-1/2 transform -translate-x-1/2"></div>
+                        <h3 class="font-bold text-md mb-1 text-orange-300">1888</h3>
+                        <p class="text-xs">Fundação da Ordem Hermética da Aurora Dourada (Golden Dawn) em Londres</p>
+                    </div>
+                    <div class="p-3 bg-orange-900 bg-opacity-20 rounded-lg relative">
+                        <div class="h-5 w-1 bg-orange-500 absolute -top-5 left-1/2 transform -translate-x-1/2"></div>
+                        <h3 class="font-bold text-md mb-1 text-orange-300">1889</h3>
+                        <p class="text-xs">Fundação da Ordem Martinista por Papus (Gérard Encausse) em Paris</p>
+                    </div>
+                    <div class="p-3 bg-orange-900 bg-opacity-20 rounded-lg relative">
+                        <div class="h-5 w-1 bg-orange-500 absolute -top-5 left-1/2 transform -translate-x-1/2"></div>
+                        <h3 class="font-bold text-md mb-1 text-orange-300">1904</h3>
+                        <p class="text-xs">Recebimento do Livro da Lei por Aleister Crowley no Cairo, fundamento de Thelema</p>
+                    </div>
+                    <div class="p-3 bg-orange-900 bg-opacity-20 rounded-lg relative">
+                        <div class="h-5 w-1 bg-orange-500 absolute -top-5 left-1/2 transform -translate-x-1/2"></div>
+                        <h3 class="font-bold text-md mb-1 text-orange-300">1915</h3>
+                        <p class="text-xs">Fundação da AMORC (Antiga e Mística Ordem Rosae Crucis) por H. Spencer Lewis</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container mx-auto px-4">
+                <div class="mb-4">
+                    <h3 class="text-xl font-bold text-purple-300 mb-2">Canal Prometheus</h3>
+                    <p class="text-sm text-gray-300">Filosofia e Espiritualidade</p>
+                </div>
+                <div class="flex justify-center mb-4">
+                    <a href="https://www.youtube.com/@Prometheus36" target="_blank" class="social-icon">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                    <a href="https://www.instagram.com/prometheus.36/" target="_blank" class="social-icon">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="https://www.tiktok.com/@prometheus.36" target="_blank" class="social-icon">
+                        <i class="fab fa-tiktok"></i>
+                    </a>
+                </div>
+                <div class="text-center text-sm text-gray-400">
+                    <p>© 2023 Prometheus - Todos os direitos reservados</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- Zoom Controls -->
+    <div class="zoom-controls">
+        <div class="zoom-btn" id="zoom-in">
+            <i class="fas fa-search-plus"></i>
+        </div>
+        <div class="zoom-btn" id="zoom-out">
+            <i class="fas fa-search-minus"></i>
+        </div>
+        <div class="zoom-btn" id="zoom-reset">
+            <i class="fas fa-sync-alt"></i>
+        </div>
+    </div>
+
+    <script>
+        // Collapsible sections
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializa todos os conteúdos colapsáveis como abertos para exibição em PDF
+            const collapsibles = document.querySelectorAll(".collapsible");
+            const contents = document.querySelectorAll(".collapsible-content");
+            
+            contents.forEach(content => {
+                content.style.maxHeight = content.scrollHeight + "px";
+            });
+            
+            collapsibles.forEach(collapsible => {
+                const chevron = collapsible.querySelector('.fa-chevron-down');
+                if (chevron) {
+                    chevron.classList.add('fa-rotate-180');
+                }
+                
+                collapsible.addEventListener("click", function() {
+                    this.classList.toggle("active");
+                    const content = this.nextElementSibling;
+                    const chevron = this.querySelector('.fa-chevron-down');
+                    
+                    if (content.style.maxHeight && content.style.maxHeight !== "0px") {
+                        content.style.maxHeight = "0px";
+                        chevron.classList.remove('fa-rotate-180');
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                        chevron.classList.add('fa-rotate-180');
+                    }
+                });
+            });
+            
+            // Zoom functionality
+            let currentZoom = 1;
+            const mainContent = document.getElementById('main-content');
+            const zoomIn = document.getElementById('zoom-in');
+            const zoomOut = document.getElementById('zoom-out');
+            const zoomReset = document.getElementById('zoom-reset');
+            
+            zoomIn.addEventListener('click', () => {
+                currentZoom += 0.1;
+                applyZoom();
+            });
+            
+            zoomOut.addEventListener('click', () => {
+                currentZoom = Math.max(0.5, currentZoom - 0.1);
+                applyZoom();
+            });
+            
+            zoomReset.addEventListener('click', () => {
+                currentZoom = 1;
+                applyZoom();
+            });
+            
+            function applyZoom() {
+                mainContent.style.transform = `scale(${currentZoom})`;
+                
+                // Adjust the container margin to compensate for zoom origin
+                if (currentZoom > 1) {
+                    const marginValue = ((currentZoom - 1) * 100) + '%';
+                    mainContent.style.marginBottom = marginValue;
+                } else {
+                    mainContent.style.marginBottom = '0';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
